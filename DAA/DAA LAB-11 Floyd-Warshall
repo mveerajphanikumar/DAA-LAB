@@ -1,0 +1,106 @@
+#include <iostream>
+#include <vector>
+#include <iomanip>
+#include <limits>
+
+using namespace std;
+
+const long long INF = numeric_limits<long long>::max() / 4;
+
+// Floyd-Warshall Algorithm
+void floydWarshall(vector<vector<long long>>& dist, int V)
+{
+    for (int k = 0; k < V; k++)
+    {
+        for (int i = 0; i < V; i++)
+        {
+            if (dist[i][k] == INF)
+                continue;
+
+            for (int j = 0; j < V; j++)
+            {
+                if (dist[k][j] == INF)
+                    continue;
+
+                long long newDist = dist[i][k] + dist[k][j];
+
+                if (newDist < dist[i][j])
+                    dist[i][j] = newDist;
+            }
+        }
+    }
+
+    // Check for negative-weight cycles
+    for (int i = 0; i < V; i++)
+    {
+        if (dist[i][i] < 0)
+        {
+            cout << "Negative-weight cycle detected.\n";
+            return;
+        }
+    }
+
+    cout << "\nShortest Distance Matrix:\n";
+
+    for (int i = 0; i < V; i++)
+    {
+        for (int j = 0; j < V; j++)
+        {
+            if (dist[i][j] == INF)
+                cout << setw(8) << "INF";
+            else
+                cout << setw(8) << dist[i][j];
+        }
+
+        cout << '\n';
+    }
+}
+
+int main()
+{
+    int V;
+
+    cout << "Enter number of vertices: ";
+    cin >> V;
+
+    if (!cin || V <= 0)
+    {
+        cout << "Invalid number of vertices.\n";
+        return 1;
+    }
+
+    vector<vector<long long>> dist(
+        V, vector<long long>(V, INF)
+    );
+
+    cout << "Enter the adjacency matrix (-1 for no edge):\n";
+    cout << "Use 0 on the diagonal.\n";
+
+    for (int i = 0; i < V; i++)
+    {
+        for (int j = 0; j < V; j++)
+        {
+            long long weight;
+            cin >> weight;
+
+            if (!cin)
+            {
+                cout << "Invalid matrix input.\n";
+                return 1;
+            }
+
+            if (i == j)
+            {
+                dist[i][j] = 0;
+            }
+            else if (weight != -1)
+            {
+                dist[i][j] = weight;
+            }
+        }
+    }
+
+    floydWarshall(dist, V);
+
+    return 0;
+}
